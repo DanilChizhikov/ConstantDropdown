@@ -1,0 +1,16 @@
+{
+  "name": "com.dtech.constatntdropdown.example",
+  "rootNamespace": "DTech",
+  "references": [
+    "GUID:59240d712442d437baa152cd824dba3d"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
