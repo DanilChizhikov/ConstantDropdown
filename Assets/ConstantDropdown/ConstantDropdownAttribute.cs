@@ -1,11 +1,10 @@
 using System;
-using UnityEngine;
 
 namespace DTech.ConstantDropdown
 {
-    public sealed class ConstantDropdownAttribute : PropertyAttribute
+    public sealed class ConstantDropdownAttribute : ConstantDropdownBaseAttribute
     {
-        public Type LinkingType { get; }
+        public override Type LinkingType { get; }
 
         public ConstantDropdownAttribute(Type linkingType)
         {

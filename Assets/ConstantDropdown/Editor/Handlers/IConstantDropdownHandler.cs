@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace DTech.ConstantDropdown.Editor
 		SerializedPropertyType ServicedPropertyType { get; }
 
 		void RefreshMap();
-		GUIContent GetCurrentValue(SerializedProperty property);
-		bool TryGetProvider(SerializedProperty property, ConstantDropdownAttribute attribute, out ConstantSearchProvider provider);
+		GUIContent GetDropdownCaption(Type linkedType, SerializedProperty property);
+		bool TrySelectValue(SerializedProperty property, Type linkedType);
 	}
 }

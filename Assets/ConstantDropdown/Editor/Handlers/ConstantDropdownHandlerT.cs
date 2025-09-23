@@ -1,38 +1,66 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace DTech.ConstantDropdown.Editor
 {
 	public abstract class ConstantDropdownHandlerT<T> : IConstantDropdownHandler
 	{
-		private readonly ConstMap<T> _map = new();
+		private static readonly GUIContent _emptyContent = new(string.Empty);
+		
+		private readonly ConstMapCollection<T> _mapCollection = new();
 		private readonly ConstantSearchProviderT<T> _provider = new();
 		
 		public abstract SerializedPropertyType ServicedPropertyType { get; }
 
-		public void RefreshMap() => _map.Clear();
+		public void RefreshMap() => _mapCollection.Clear();
 		
-		public GUIContent GetCurrentValue(SerializedProperty property)
+		public GUIContent GetDropdownCaption(Type linkedType, SerializedProperty property)
 		{
 			T value = GetPropertyValue(property);
-			return new GUIContent(value.ToString());
+			if (!_mapCollection.TryGetMap(linkedType, out Dictionary<string, T> map))
+			{
+				return _emptyContent;
+			}
+
+			return new GUIContent(GetKeyFromValue(value, map));
 		}
 
-		public bool TryGetProvider(SerializedProperty property, ConstantDropdownAttribute attribute, out ConstantSearchProvider provider)
+		public bool TrySelectValue(SerializedProperty property, Type linkedType)
 		{
-			provider = _provider;
-			if (!_map.TryGetSourceType(attribute.LinkingType, out Dictionary<string, T> map, out GUIContent[] content))
+			if (!_mapCollection.TryGetMap(linkedType, out Dictionary<string, T> map))
 			{
 				return false;
 			}
-
-			_provider.Setup(map, (_, value) => SetPropertyValue(property, value));
+			
+			_provider.Setup(map, (_, value) =>
+			{
+				SetPropertyValue(property, value);
+				property.serializedObject.ApplyModifiedProperties();
+			});
+			
+			var context = new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition));
+			SearchWindow.Open(context, _provider);
 			return true;
 		}
 
 		protected abstract T GetPropertyValue(SerializedProperty property);
 
 		protected abstract void SetPropertyValue(SerializedProperty property, T value);
+		
+		private static string GetKeyFromValue(T value, Dictionary<string, T> map)
+		{
+			foreach (var entry in map)
+			{
+				if (entry.Value.Equals(value))
+				{
+					return entry.Key;
+				}
+			}
+			
+			return string.Empty;
+		}
 	}
 }
