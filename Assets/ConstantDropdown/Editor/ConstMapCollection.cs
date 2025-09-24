@@ -1,32 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 
 namespace DTech.ConstantDropdown.Editor
 {
-	internal sealed class ConstMap<T>
+	internal sealed class ConstMapCollection<T>
 	{
 		private readonly Dictionary<Type, Dictionary<string, T>> _map;
-		private readonly Dictionary<Type, GUIContent[]> _contents;
 
-		private bool _isInitialized;
+		private bool _isMapColleted;
 
-		public ConstMap()
+		public ConstMapCollection()
 		{
 			_map = new Dictionary<Type, Dictionary<string, T>>();
-			_contents = new Dictionary<Type, GUIContent[]>();
-			_isInitialized = false;
+			_isMapColleted = false;
 		}
 
-		public bool TryGetSourceType(Type linkedType, out Dictionary<string, T> map, out GUIContent[] content)
+		public bool TryGetMap(Type linkedType, out Dictionary<string, T> map)
 		{
-			Initialize();
+			CollectMap();
 			map = null;
-			content = null;
 			if (_map.TryGetValue(linkedType, out map))
 			{
-				content = _contents[linkedType];
 				return true;
 			}
 
@@ -36,13 +31,12 @@ namespace DTech.ConstantDropdown.Editor
 		public void Clear()
 		{
 			_map.Clear();
-			_contents.Clear();
-			_isInitialized = false;
+			_isMapColleted = false;
 		}
 
-		private void Initialize()
+		private void CollectMap()
 		{
-			if (_isInitialized)
+			if (_isMapColleted)
 			{
 				return;
 			}
@@ -69,15 +63,13 @@ namespace DTech.ConstantDropdown.Editor
 							}
                             
 							_map.Add(sourceAttribute.LinkingType, sourceMap);
-							GUIContent[] content = GetContents(sourceMap);
-							_contents.Add(sourceAttribute.LinkingType, content);
 							break;
 						}
 					}
 				}
 			}
 
-			_isInitialized = true;
+			_isMapColleted = true;
 		}
 		
 		private static Dictionary<string, T> GetSourceMap(Type type)
@@ -102,32 +94,6 @@ namespace DTech.ConstantDropdown.Editor
 			}
 
 			return dictionary;
-		}
-
-		private static GUIContent[] GetContents(Dictionary<string, T> sourceMap)
-		{
-			var result = new List<GUIContent>();
-			if (sourceMap.Count > 0)
-			{
-				foreach (string key in sourceMap.Keys)
-				{
-					result.Add(new GUIContent(key));
-				}
-			}
-
-			return result.ToArray();
-		}
-	}
-
-	internal sealed class IntMap
-	{
-		private readonly Dictionary<Type, Dictionary<string, int>> _map;
-		private readonly Dictionary<Type, GUIContent[]> _contents;
-
-		public IntMap()
-		{
-			_map = new Dictionary<Type, Dictionary<string, int>>();
-			_contents = new Dictionary<Type, GUIContent[]>();
 		}
 	}
 }

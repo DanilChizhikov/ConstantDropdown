@@ -1,42 +1,66 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace DTech.ConstantDropdown.Editor
 {
 	public abstract class ConstantDropdownHandlerT<T> : IConstantDropdownHandler
 	{
-		private readonly ConstMap<T> _map = new();
+		private static readonly GUIContent _emptyContent = new(string.Empty);
+		
+		private readonly ConstMapCollection<T> _mapCollection = new();
+		private readonly ConstantSearchProviderT<T> _provider = new();
 		
 		public abstract SerializedPropertyType ServicedPropertyType { get; }
 
-		public void RefreshMap() => _map.Clear();
-
-		public bool Draw(ConstantDrawInfo info)
+		public void RefreshMap() => _mapCollection.Clear();
+		
+		public GUIContent GetDropdownCaption(Type linkedType, SerializedProperty property)
 		{
-			if (!_map.TryGetSourceType(info.Attribute.LinkingType, out Dictionary<string, T> map, out GUIContent[] content))
+			T value = GetPropertyValue(property);
+			if (!_mapCollection.TryGetMap(linkedType, out Dictionary<string, T> map))
+			{
+				return _emptyContent;
+			}
+
+			return new GUIContent(GetKeyFromValue(value, map));
+		}
+
+		public bool TrySelectValue(SerializedProperty property, Type linkedType)
+		{
+			if (!_mapCollection.TryGetMap(linkedType, out Dictionary<string, T> map))
 			{
 				return false;
 			}
-
-			T propertyValue = GetPropertyValue(info.Property);
-			int selectedIndex = ConstantDropdownUtils.GetSelectedIndex(propertyValue, map, content);
-			using var check = new EditorGUI.ChangeCheckScope();
-			selectedIndex = EditorGUI.Popup(info.Position, info.Label, selectedIndex, content);
-			if (check.changed &&
-				selectedIndex >= 0 &&
-				selectedIndex < content.Length &&
-				map.TryGetValue(content[selectedIndex].text, out T value))
-			{
-				SetPropertyValue(info.Property, value);
-			}
 			
-			ConstantDropdownUtils.DrawErrorIfInvalid(info.Position, selectedIndex, GetPropertyValue(info.Property).ToString());
+			_provider.Setup(map, (_, value) =>
+			{
+				SetPropertyValue(property, value);
+				property.serializedObject.ApplyModifiedProperties();
+			});
+			
+			var context = new SearchWindowContext(GUIUtility.GUIToScreenPoint(Event.current.mousePosition));
+			SearchWindow.Open(context, _provider);
 			return true;
 		}
 
 		protected abstract T GetPropertyValue(SerializedProperty property);
 
 		protected abstract void SetPropertyValue(SerializedProperty property, T value);
+		
+		private static string GetKeyFromValue(T value, Dictionary<string, T> map)
+		{
+			foreach (var entry in map)
+			{
+				if (entry.Value.Equals(value))
+				{
+					return entry.Key;
+				}
+			}
+			
+			return string.Empty;
+		}
 	}
 }
