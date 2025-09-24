@@ -1,0 +1,25 @@
+{
+    "name": "com.danilchizhikov.constatntdropdown",
+    "displayName": "Constatnt Dropdown",
+    "version": "1.0.0",
+    "unity": "2022.3",
+    "description": "Custom inspector for constant values",
+    "keywords": [
+        "Editor",
+        "Inspector",
+        "Constant",
+        "Dropdown",
+        "Custom Inspector"
+    ],
+    "category": "Tools",
+    "author": "MbsCore",
+    "repository": {
+        "type": "git",
+        "url": "ssh://github.com:DanilChizhikov/ConstantDropdown.git",
+        "directory": "com.danilchizhikov.constatntdropdown"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com/@DanilChizhikov"
+    },
+    "license": "MIT"
+}

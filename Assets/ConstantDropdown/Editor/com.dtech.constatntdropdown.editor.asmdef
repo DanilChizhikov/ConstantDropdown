@@ -1,0 +1,18 @@
+{
+    "name": "com.dtech.constatntdropdown.editor",
+    "rootNamespace": "DTech",
+    "references": [
+        "GUID:59240d712442d437baa152cd824dba3d"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
