@@ -5,5 +5,11 @@ namespace DTech.ConstantDropdown.Example
     internal sealed class StringDropdownAttribute : ConstantDropdownBaseAttribute
     {
         public override Type LinkingType => typeof(StringConstantClass);
+        public override string PrefixName { get; }
+        
+        public StringDropdownAttribute(string prefixName = "")
+        {
+            PrefixName = prefixName;
+        }
     }
 }

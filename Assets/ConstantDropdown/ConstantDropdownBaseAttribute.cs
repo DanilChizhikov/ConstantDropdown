@@ -6,5 +6,6 @@ namespace DTech.ConstantDropdown
     public abstract class ConstantDropdownBaseAttribute : PropertyAttribute
     {
         public abstract Type LinkingType { get; }
+        public abstract string PrefixName { get; }
     }
 }
