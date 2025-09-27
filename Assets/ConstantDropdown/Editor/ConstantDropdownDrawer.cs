@@ -13,12 +13,13 @@ namespace DTech.ConstantDropdown.Editor
         private const float MinDropdownWidth = 100f;
 
         private static readonly Dictionary<SerializedPropertyType, IConstantDropdownHandler> _handlers = new();
-        private static readonly GUIStyle _buttonStyle = new(EditorStyles.miniButton);
         private static readonly GUIContent _resetButtonContent = new("Reset Const Map");
+        
+        private ConstantDropdownBaseAttribute Attribute => (ConstantDropdownBaseAttribute)attribute;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (!(attribute is ConstantDropdownBaseAttribute dropdownAttribute))
+            if (!(attribute is ConstantDropdownBaseAttribute))
             {
                 EditorGUI.PropertyField(position, property, label);
                 return;
@@ -33,8 +34,20 @@ namespace DTech.ConstantDropdown.Editor
             
             Rect positionAfterLabel = EditorGUI.PrefixLabel(position, label);
             CalculateRects(positionAfterLabel, out Rect dropdownRect, out Rect buttonRect);
-            DrawDropdown(dropdownRect, property, dropdownAttribute.LinkingType, handler);
+            DrawDropdown(dropdownRect, property, Attribute.LinkingType, handler);
             DrawResetButton(buttonRect, handler);
+        }
+        
+        private void DrawDropdown(Rect position, SerializedProperty property, Type linkingType, IConstantDropdownHandler handler)
+        {
+            GUIContent dropdownCaption = handler.GetDropdownCaption(linkingType, property, Attribute.PrefixName);
+            if (GUI.Button(position, dropdownCaption, EditorStyles.popup))
+            {
+                if (!handler.TrySelectValue(property, linkingType))
+                {
+                    Debug.LogError("This property type is not supported.");
+                }
+            }
         }
 
         private static void EnsureHandlers()
@@ -61,7 +74,7 @@ namespace DTech.ConstantDropdown.Editor
 
         private static void CalculateRects(Rect position, out Rect dropdownRect, out Rect buttonRect)
         {
-            float buttonWidth = Mathf.Max(MinButtonWidth, _buttonStyle.CalcSize(_resetButtonContent).x + ButtonPadding);
+            float buttonWidth = Mathf.Max(MinButtonWidth, EditorStyles.miniButton.CalcSize(_resetButtonContent).x + ButtonPadding);
             
             dropdownRect = new Rect(position.x, position.y, position.width - buttonWidth - 2f, position.height);
             buttonRect = new Rect(dropdownRect.xMax + 2f, position.y, buttonWidth, position.height);
@@ -78,21 +91,9 @@ namespace DTech.ConstantDropdown.Editor
             }
         }
 
-        private static void DrawDropdown(Rect position, SerializedProperty property, Type linkingType, IConstantDropdownHandler handler)
-        {
-            GUIContent dropdownCaption = handler.GetDropdownCaption(linkingType, property);
-            if (GUI.Button(position, dropdownCaption, EditorStyles.popup))
-            {
-                if (!handler.TrySelectValue(property, linkingType))
-                {
-                    Debug.LogError("This property type is not supported.");
-                }
-            }
-        }
-
         private static void DrawResetButton(Rect position, IConstantDropdownHandler handler)
         {
-            if (GUI.Button(position, _resetButtonContent, _buttonStyle))
+            if (GUI.Button(position, _resetButtonContent, EditorStyles.miniButton))
             {
                 handler.RefreshMap();
             }

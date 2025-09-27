@@ -9,7 +9,7 @@ namespace DTech.ConstantDropdown.Editor
 		SerializedPropertyType ServicedPropertyType { get; }
 
 		void RefreshMap();
-		GUIContent GetDropdownCaption(Type linkedType, SerializedProperty property);
+		GUIContent GetDropdownCaption(Type linkedType, SerializedProperty property, string prefixName);
 		bool TrySelectValue(SerializedProperty property, Type linkedType);
 	}
 }

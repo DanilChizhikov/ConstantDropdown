@@ -17,7 +17,7 @@ namespace DTech.ConstantDropdown.Editor
 
 		public void RefreshMap() => _mapCollection.Clear();
 		
-		public GUIContent GetDropdownCaption(Type linkedType, SerializedProperty property)
+		public GUIContent GetDropdownCaption(Type linkedType, SerializedProperty property, string prefixName)
 		{
 			T value = GetPropertyValue(property);
 			if (!_mapCollection.TryGetMap(linkedType, out Dictionary<string, T> map))
@@ -25,7 +25,13 @@ namespace DTech.ConstantDropdown.Editor
 				return _emptyContent;
 			}
 
-			return new GUIContent(GetKeyFromValue(value, map));
+			string caption = GetKeyFromValue(value, map);
+			if (!string.IsNullOrEmpty(prefixName))
+			{
+				caption = $"{prefixName}_{caption}";
+			}
+			
+			return new GUIContent(caption);
 		}
 
 		public bool TrySelectValue(SerializedProperty property, Type linkedType)
