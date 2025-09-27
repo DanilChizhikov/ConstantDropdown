@@ -13,7 +13,6 @@ namespace DTech.ConstantDropdown.Editor
         private const float MinDropdownWidth = 100f;
 
         private static readonly Dictionary<SerializedPropertyType, IConstantDropdownHandler> _handlers = new();
-        private static readonly GUIStyle _buttonStyle = new(EditorStyles.miniButton);
         private static readonly GUIContent _resetButtonContent = new("Reset Const Map");
         
         private ConstantDropdownBaseAttribute Attribute => (ConstantDropdownBaseAttribute)attribute;
@@ -75,7 +74,7 @@ namespace DTech.ConstantDropdown.Editor
 
         private static void CalculateRects(Rect position, out Rect dropdownRect, out Rect buttonRect)
         {
-            float buttonWidth = Mathf.Max(MinButtonWidth, _buttonStyle.CalcSize(_resetButtonContent).x + ButtonPadding);
+            float buttonWidth = Mathf.Max(MinButtonWidth, EditorStyles.miniButton.CalcSize(_resetButtonContent).x + ButtonPadding);
             
             dropdownRect = new Rect(position.x, position.y, position.width - buttonWidth - 2f, position.height);
             buttonRect = new Rect(dropdownRect.xMax + 2f, position.y, buttonWidth, position.height);
@@ -94,7 +93,7 @@ namespace DTech.ConstantDropdown.Editor
 
         private static void DrawResetButton(Rect position, IConstantDropdownHandler handler)
         {
-            if (GUI.Button(position, _resetButtonContent, _buttonStyle))
+            if (GUI.Button(position, _resetButtonContent, EditorStyles.miniButton))
             {
                 handler.RefreshMap();
             }
