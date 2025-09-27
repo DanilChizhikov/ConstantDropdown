@@ -2,6 +2,7 @@ using System;
 
 namespace DTech.ConstantDropdown
 {
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public sealed class ConstantDropdownAttribute : ConstantDropdownBaseAttribute
     {
         public override Type LinkingType { get; }

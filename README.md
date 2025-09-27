@@ -12,6 +12,7 @@ Constant Dropdown is a Unity editor extension that provides a customizable dropd
 - [Usage](#usage)
     - [Basic Usage](#basic-usage)
     - [Supported Types](#supported-types)
+    - [ConstantDropdown](#constantdropdown)
 - [License](#license)
 
 ## Features
@@ -27,7 +28,7 @@ Constant Dropdown is a Unity editor extension that provides a customizable dropd
 1. Navigate to your project's Packages folder and open the manifest.json file.
 2. Add this line below the "dependencies": { line
     - ```json title="Packages/manifest.json"
-      "com.danilchizhikov.constatntdropdown": "https://github.com/DanilChizhikov/ConstantDropdown.git?path=Assets/ConstantDropdown#1.0.0",
+      "com.danilchizhikov.constatntdropdown": "https://github.com/DanilChizhikov/ConstantDropdown.git?path=Assets/ConstantDropdown#1.1.0",
       ```
 UPM should now install the package.
 
@@ -40,16 +41,38 @@ UPM should now install the package.
 ### Basic Usage
 
 1. Create a static class with your constants:
-   ```csharp
-   public static class StringConstantClass
-   {
-       public const string Option1 = "First Option";
-       public const string Option2 = "Second Option";
-       public const string Option3 = "Third Option";
-   }
-   ```
+   - Usage with class
+     ```csharp
+     [ConstantSource(typeof(StringConstantClass))]
+     public static class StringConstantClass
+     {
+         public const string Option1 = "First Option";
+         public const string Option2 = "Second Option";
+         public const string Option3 = "Third Option";
+     }
+     ```
+   - Usage with collection
+      ```csharp
+      public static class StringConstantClass
+      {
+        private const string Item1 = "Item_1";
+        private const string Item2 = "Item_2";
+        private const string Item3 = "Item_3/Item_1/Item_1";
+        private const string Item4 = "Item_3/Item_1/Item_2";
+		
+        [ConstantSource(typeof(StringConstantClass))]
+        public static readonly string[] Items = new string[]
+        {
+            Item1,
+            Item2,
+            Item3,
+            Item4,
+        };
+      }
+      ```
 
 2. Use the `[ConstantDropdown]` attribute in your MonoBehaviour:
+    - MonoBehaviour
    ```csharp
    using UnityEngine;
    using DTech.ConstantDropdown;
@@ -60,8 +83,7 @@ UPM should now install the package.
        private string myStringConstant;
    }
    ```
-
-3. Use the `[ConstantDropdown]` attribute in your ScriptableObject:
+   - ScriptableObject
    ```csharp
    using UnityEngine;
    using DTech.ConstantDropdown;
@@ -102,6 +124,38 @@ private int myIntConstant;
 [SerializeField, ConstantDropdown(typeof(FloatConstantClass))]
 private float myFloatConstant;
 ```
+
+### ConstantDropdown
+- Base Class
+```csharp
+public abstract class ConstantDropdownBaseAttribute : PropertyAttribute
+{
+    public abstract Type LinkingType { get; }
+    public abstract string PrefixName { get; }
+}
+```
+
+| Property | Type | Description                                |
+|----------|------|--------------------------------------------|
+| LinkingType | Type | The type of the constant class          |
+| PrefixName | string | The prefix name of the display value   |
+
+- Default Class
+```csharp
+[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+public sealed class ConstantDropdownAttribute : ConstantDropdownBaseAttribute
+{
+    public override Type LinkingType { get; }
+    public override string PrefixName { get; }
+
+    public ConstantDropdownAttribute(Type linkingType, string prefixName = "")
+    {
+        LinkingType = linkingType;
+        PrefixName = prefixName;
+    }
+}
+```
+
 
 ## License
 
