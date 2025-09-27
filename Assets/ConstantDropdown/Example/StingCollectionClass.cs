@@ -7,7 +7,8 @@ namespace DTech.ConstantDropdown.Example
 		{
 			"Item_1",
 			"Item_2",
-			"Item_3",
+			"Item_3/SubItem_1/SubSubItem_1",
+			"Item_3/SubItem_1/SubSubItem_2",
 		};
 	}
 }
