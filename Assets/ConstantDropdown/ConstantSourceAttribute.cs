@@ -2,7 +2,7 @@ using System;
 
 namespace DTech.ConstantDropdown
 {
-	[AttributeUsage(AttributeTargets.Enum | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
 	public sealed class ConstantSourceAttribute : Attribute
 	{
 		public Type LinkingType { get; }
