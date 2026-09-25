@@ -7,15 +7,21 @@ namespace DTech.ConstantDropdown.Editor
 	{
 		public abstract int Priority { get; }
 		
-		public void Collect(Dictionary<Type, Dictionary<string, T>> map)
+		public void Collect(Dictionary<Type, List<ConstSource<T>>> sources)
 		{
-			Dictionary<Type, Dictionary<string, T>> results = CollectInternal();
-			foreach (var result in results)
+			List<(Type LinkingType, ConstSource<T> Source)> results = CollectInternal();
+			foreach (var (linkingType, source) in results)
 			{
-				map.TryAdd(result.Key, result.Value);
+				if (!sources.TryGetValue(linkingType, out List<ConstSource<T>> list))
+				{
+					list = new List<ConstSource<T>>();
+					sources.Add(linkingType, list);
+				}
+				
+				list.Add(source);
 			}
 		}
 		
-		protected abstract Dictionary<Type, Dictionary<string, T>> CollectInternal();
+		protected abstract List<(Type LinkingType, ConstSource<T> Source)> CollectInternal();
 	}
 }

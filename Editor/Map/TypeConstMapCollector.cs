@@ -11,9 +11,9 @@ namespace DTech.ConstantDropdown.Editor
 		
 		public override int Priority => 0;
 		
-		protected override Dictionary<Type, Dictionary<string, T>> CollectInternal()
+		protected override List<(Type LinkingType, ConstSource<T> Source)> CollectInternal()
 		{
-			var result = new Dictionary<Type, Dictionary<string, T>>();
+			var result = new List<(Type LinkingType, ConstSource<T> Source)>();
 			var collection = TypeCache.GetTypesWithAttribute<ConstantSourceAttribute>();
             
 			foreach (Type type in collection)
@@ -24,7 +24,7 @@ namespace DTech.ConstantDropdown.Editor
 				Dictionary<string, T> sourceMap = GetSourceMap(type);
 				if (sourceMap.Count > 0)
 				{
-					result[attribute.LinkingType] = sourceMap;
+					result.Add((attribute.LinkingType, new ConstSource<T>(type.Name, sourceMap)));
 				}
 			}
             
