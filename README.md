@@ -28,9 +28,13 @@ Constant Dropdown is a Unity editor extension that provides a customizable dropd
 1. Navigate to your project's Packages folder and open the manifest.json file.
 2. Add this line below the "dependencies": { line
     - ```json title="Packages/manifest.json"
-      "com.danilchizhikov.constatntdropdown": "https://github.com/DanilChizhikov/ConstantDropdown.git?path=Assets/ConstantDropdown#1.1.0",
+      "com.danilchizhikov.constantdropdown": "https://github.com/DanilChizhikov/ConstantDropdown.git",
       ```
 UPM should now install the package.
+
+If you want to set a target version, uses the `v*.*.*` release tag so you can specify a version like #v1.2.0.
+
+For example `https://github.com/DanilChizhikov/link-guard.git#v1.2.0`.
 
 ### Install manually (using .unitypackage)
 1. Download the latest .unitypackage from the [releases](https://github.com/DanilChizhikov/ConstantDropdown/releases) page
