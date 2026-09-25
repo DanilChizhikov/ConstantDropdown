@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEditor;
 
@@ -10,9 +9,9 @@ namespace DTech.ConstantDropdown.Editor
 	{
 		public override int Priority => 1;
 
-		protected override Dictionary<Type, Dictionary<string, T>> CollectInternal()
+		protected override List<(Type LinkingType, ConstSource<T> Source)> CollectInternal()
 		{
-			var result = new Dictionary<Type, Dictionary<string, T>>();
+			var result = new List<(Type LinkingType, ConstSource<T> Source)>();
 			var collection = TypeCache.GetFieldsWithAttribute<ConstantSourceAttribute>();
 
 			foreach (FieldInfo field in collection)
@@ -23,8 +22,14 @@ namespace DTech.ConstantDropdown.Editor
 				if (field.GetValue(null) is ICollection<T> values &&
 					values.Count > 0)
 				{
-					Dictionary<string, T> sourceMap = values.ToDictionary(x => x.ToString(), x => x);
-					result[attribute.LinkingType] = sourceMap;
+					var sourceMap = new Dictionary<string, T>(values.Count);
+					foreach (T value in values)
+					{
+						sourceMap.TryAdd(value.ToString(), value);
+					}
+
+					string sourceName = $"{field.DeclaringType?.Name}.{field.Name}";
+					result.Add((attribute.LinkingType, new ConstSource<T>(sourceName, sourceMap)));
 				}
 			}
 
