@@ -12,6 +12,8 @@ Constant Dropdown is a Unity editor extension that provides a customizable dropd
 - [Usage](#usage)
     - [Basic Usage](#basic-usage)
     - [Supported Types](#supported-types)
+    - [Multiple Sources](#multiple-sources)
+    - [ConstantSource](#constantsource)
     - [ConstantDropdown](#constantdropdown)
 - [License](#license)
 
@@ -20,6 +22,10 @@ Constant Dropdown is a Unity editor extension that provides a customizable dropd
 - Type-safe constant selection in the Unity Inspector
 - Easy integration with existing code
 - Support for custom constant classes
+- Collections (static readonly arrays) as a constant source
+- Nested menus via `/` in collection values
+- Merging multiple sources into one dropdown
+- Custom attributes via `ConstantDropdownBaseAttribute`
 - Simple and intuitive API
 
 ## Installation
@@ -34,7 +40,7 @@ UPM should now install the package.
 
 If you want to set a target version, uses the `v*.*.*` release tag so you can specify a version like #v1.2.0.
 
-For example `https://github.com/DanilChizhikov/link-guard.git#v1.2.0`.
+For example `https://github.com/DanilChizhikov/ConstantDropdown.git#v1.2.0`.
 
 ### Install manually (using .unitypackage)
 1. Download the latest .unitypackage from the [releases](https://github.com/DanilChizhikov/ConstantDropdown/releases) page
@@ -108,6 +114,7 @@ Constant Dropdown supports the following types:
 
 Example with different types:
 ```csharp
+[ConstantSource(typeof(IntConstantClass))]
 public static class IntConstantClass
 {
     public const int Value1 = 1;
@@ -115,6 +122,7 @@ public static class IntConstantClass
     public const int Value3 = 3;
 }
 
+[ConstantSource(typeof(FloatConstantClass))]
 public static class FloatConstantClass
 {
     public const float Small = 0.1f;
@@ -128,6 +136,61 @@ private int myIntConstant;
 [SerializeField, ConstantDropdown(typeof(FloatConstantClass))]
 private float myFloatConstant;
 ```
+
+### Multiple Sources
+
+Several sources can share the same linking type. Their values are merged into one dropdown:
+```csharp
+[ConstantSource(typeof(StringConstantClass))]
+public static class StringConstantClass
+{
+    public const string ConstFirst = "First";
+    public const string ConstSecond = "Second";
+}
+
+[ConstantSource(typeof(StringConstantClass))]
+public static class StringConstantClassExtra
+{
+    public const string ConstFirst = "ExtraFirst";
+    public const string ConstThird = "Third";
+}
+
+[SerializeField, ConstantDropdown(typeof(StringConstantClass))]
+private string myStringConstant;
+```
+
+The dropdown shows the values grouped by source:
+```
+StringConstantClass/ConstFirst
+StringConstantClass/ConstSecond
+StringConstantClassExtra/ConstFirst
+StringConstantClassExtra/ConstThird
+```
+
+- A class source is grouped by its type name (`TypeName`), a collection field by `DeclaringType.FieldName`
+- With a single source, values are shown without grouping
+- Keys that clash after merge (e.g. two sources with the same name) are logged as a warning and skipped
+
+### ConstantSource
+```csharp
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+public sealed class ConstantSourceAttribute : Attribute
+{
+    public Type LinkingType { get; }
+
+    public ConstantSourceAttribute(Type linkingType)
+    {
+        LinkingType = linkingType;
+    }
+}
+```
+
+| Property | Type | Description                                                   |
+|----------|------|---------------------------------------------------------------|
+| LinkingType | Type | The type used as a key in `[ConstantDropdown(typeof(...))]` |
+
+- On a class: all public static fields of the dropdown field type are collected
+- On a static field: collection (`ICollection<T>`) values are collected, `/` in values creates nested menus
 
 ### ConstantDropdown
 - Base Class
@@ -158,6 +221,31 @@ public sealed class ConstantDropdownAttribute : ConstantDropdownBaseAttribute
         PrefixName = prefixName;
     }
 }
+```
+
+`PrefixName` is prepended to the displayed value as `{PrefixName}_{Value}`:
+```csharp
+[SerializeField, ConstantDropdown(typeof(StingCollectionClass), "Collection")]
+private string myCollectionItem;
+```
+
+- Custom Attribute
+
+Inherit `ConstantDropdownBaseAttribute` to bind a linking type once and reuse it:
+```csharp
+public sealed class StringDropdownAttribute : ConstantDropdownBaseAttribute
+{
+    public override Type LinkingType => typeof(StringConstantClass);
+    public override string PrefixName { get; }
+
+    public StringDropdownAttribute(string prefixName = "")
+    {
+        PrefixName = prefixName;
+    }
+}
+
+[SerializeField, StringDropdown]
+private string myStringConstant;
 ```
 
 

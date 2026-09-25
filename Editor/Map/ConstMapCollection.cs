@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace DTech.ConstantDropdown.Editor
 {
 	internal sealed class ConstMapCollection<T>
 	{
+		private const string DuplicateKeyWarningTemplate = "[ConstantDropdown] Duplicate key [{0}] for linked type [{1}], skipped";
+		
 		private static readonly List<IConstMapCollector<T>> _collectors = new();
 		
 		private readonly Dictionary<Type, Dictionary<string, T>> _map;
@@ -59,13 +62,42 @@ namespace DTech.ConstantDropdown.Editor
 				return;
 			}
 			
+			var sources = new Dictionary<Type, List<ConstSource<T>>>();
 			for (int i = 0; i < _collectors.Count; i++)
 			{
 				IConstMapCollector<T> collector = _collectors[i];
-				collector.Collect(_map);
+				collector.Collect(sources);
+			}
+
+			foreach (var (linkedType, typeSources) in sources)
+			{
+				_map[linkedType] = MergeSources(linkedType, typeSources);
 			}
 
 			_isMapColleted = true;
+		}
+
+		private static Dictionary<string, T> MergeSources(Type linkedType, List<ConstSource<T>> sources)
+		{
+			if (sources.Count == 1)
+			{
+				return sources[0].Values;
+			}
+
+			var merged = new Dictionary<string, T>();
+			foreach (ConstSource<T> source in sources)
+			{
+				foreach (var (key, value) in source.Values)
+				{
+					string mergedKey = $"{source.Name}/{key}";
+					if (!merged.TryAdd(mergedKey, value))
+					{
+						Debug.LogWarning(string.Format(DuplicateKeyWarningTemplate, mergedKey, linkedType));
+					}
+				}
+			}
+
+			return merged;
 		}
 	}
 }
