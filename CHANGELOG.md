@@ -2,6 +2,12 @@
 
 ## [1.2.0] - unreleased
 
+### Changes
+
+- support multiple `[ConstantSource]` with the same linking type: values from all sources are merged into one dropdown and grouped by source name (`TypeName/...` for classes, `DeclaringType.FieldName/...` for collection fields). Previously only the first found source was used
+- keys that clash after merge are logged as a warning and skipped
+- package files moved to repository root
+
 ## [1.1.0] - unreleased
 
 ### Changes
