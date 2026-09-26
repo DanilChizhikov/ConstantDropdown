@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.1] - 2026-09-26
+
+### Changes
+
+- renamed scope to 'com.dtech'
+
 ## [1.2.0] - 2026-09-25
 
 ### Changes

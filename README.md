@@ -38,9 +38,9 @@ Constant Dropdown is a Unity editor extension that provides a customizable dropd
       ```
 UPM should now install the package.
 
-If you want to set a target version, uses the `v*.*.*` release tag so you can specify a version like #v1.2.0.
+If you want to set a target version, uses the `v*.*.*` release tag so you can specify a version like #v1.2.1.
 
-For example `https://github.com/DanilChizhikov/ConstantDropdown.git#v1.2.0`.
+For example `https://github.com/DanilChizhikov/ConstantDropdown.git#v1.2.1`.
 
 ### Install manually (using .unitypackage)
 1. Download the latest .unitypackage from the [releases](https://github.com/DanilChizhikov/ConstantDropdown/releases) page
